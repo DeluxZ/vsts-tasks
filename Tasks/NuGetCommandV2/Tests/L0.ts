@@ -1,12 +1,30 @@
 import * as path from 'path';
 import * as assert from 'assert';
 import * as ttm from 'vsts-task-lib/mock-test';
+import * as cp from "child_process";
 
 describe('NuGetCommand Suite', function () {
     before(() => {
     });
 
     after(() => {
+    });
+
+    it('credential provider V2 does not throw error', (done: MochaDone) => {
+        this.timeout(1000);
+
+        let relativePath = "/../node_modules/nuget-task-common/NuGet/CredentialProviderV2/plugins/netfx/CredentialProvider.Microsoft/CredentialProvider.Microsoft.exe";
+        let credentialProviderPath = path.join(__dirname, relativePath);
+        cp.exec(credentialProviderPath + " -h", (error, stdout, stderr) => {
+            if (error || stderr) {
+                console.log("credential provider V2 threw an error:");
+                console.log(error);
+                console.log(stderr);
+            }
+
+            assert.equal(stdout.toString().indexOf("List of Environment Variables") >= 0, true);
+            done();
+        });
     });
 
     it('restore single solution', (done: MochaDone) => {
